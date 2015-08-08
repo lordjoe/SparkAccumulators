@@ -1,4 +1,4 @@
-package com.lordjoe.distributed;
+package com.lordjoe.distributed.spark.accumulators;
 
 import org.apache.spark.api.java.function.*;
 import scala.*;
@@ -6,7 +6,8 @@ import scala.*;
 import java.io.Serializable;
 
 /**
- * org.apache.spark.api.java.function.AbstraceLoggingFunction
+ * ocom.lordjoe.distributed.spark.accumulators.AbstraceLoggingFunction
+ * stand in for  PairFlatMapFunctio
  * superclass for defined functions that will log on first call making it easier to see
  * do work in doCall
  * User: Steve

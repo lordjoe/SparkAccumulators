@@ -1,11 +1,10 @@
-package com.lordjoe.distributed;
+package com.lordjoe.distributed.spark.accumulators;
 
-import com.lordjoe.distributed.spark.accumulators.SparkAccumulators;
 
 import java.io.*;
 
 /**
- * org.apache.spark.api.java.function.AbstraceLoggingFunction
+ * com.lordjoe.distributed.spark.accumulators.AbstraceLoggingFunction
  * superclass for defined functions that will log on first call making it easier to see
  * also will keep an accumulator to track calls and where ther are made
  * do work in doCall
@@ -14,36 +13,35 @@ import java.io.*;
  */
 public abstract class AbstractLoggingFunctionBase implements Serializable {
 
-   // write ever y time the functio is called this many times
+   // write ever y time the function is called this many times
     private static int callReportInterval = 50000;
 
     public static int getCallReportInterval() {
         return callReportInterval;
     }
 
+    @SuppressWarnings("unused")
     public static void setCallReportInterval(final int pCallReportInterval) {
         callReportInterval = pCallReportInterval;
     }
 
     private transient boolean logged;   // transient so every machine keeps its own
     private transient long numberCalls;   // transient so every machine keeps its own
-    private SparkAccumulators accumulators; // member so it will be serialized from the executor
     private transient long startTime;     // transient so every machine keeps its own
     private transient long totalTime;
     private transient long accumulatedTime;
+    private final ISparkAccumulators accumulators;
 
 
     protected AbstractLoggingFunctionBase() {
+         // make an accumulator if one does not exist - should happen in hte executor
+         accumulators = AccumulatorUtilities.getInstance();
         if (!isFunctionCallsLogged())
             return;
-        // make an accumulator if one does not exist - should happen in hte executor
-        SparkAccumulators instance = SparkAccumulators.getInstance();
-        if (instance != null)
-            accumulators = instance; // might be null but serialization should set
-        // build an accumulator for this function
+         // build an accumulator for this function
         if (accumulators != null) {
             String className = getClass().getSimpleName();
-            SparkAccumulators.createFunctionAccumulator(className);
+            accumulators.createFunctionAccumulator(className);
           }
     }
 
@@ -59,7 +57,7 @@ public abstract class AbstractLoggingFunctionBase implements Serializable {
     /**
      * really the time this function was first called as a local copy
      *
-     * @return
+     * @return  time
      */
     public long getStartTIme() {
         if (startTime == 0) {
@@ -68,6 +66,7 @@ public abstract class AbstractLoggingFunctionBase implements Serializable {
         return startTime;
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     public long getAccumulatedTime() {
         return accumulatedTime;
     }
@@ -78,6 +77,10 @@ public abstract class AbstractLoggingFunctionBase implements Serializable {
     }
 
 
+    /**
+     * as it says
+     * @return  time
+     */
     public long getAndClearAccumulatedTime() {
         long ret = accumulatedTime;
         accumulatedTime = 0;
@@ -87,10 +90,10 @@ public abstract class AbstractLoggingFunctionBase implements Serializable {
     /**
      * Override this to prevent logging
      *
-     * @return
+     * @return  true if we track timing
      */
     public boolean isFunctionCallsLogged() {
-        return SparkAccumulators.isFunctionsLoggedByDefault();
+        return AccumulatorUtilities.isFunctionsLoggedByDefault();
     }
 
     public final boolean isLogged() {
@@ -109,7 +112,7 @@ public abstract class AbstractLoggingFunctionBase implements Serializable {
         numberCalls++;
     }
 
-    public SparkAccumulators getAccumulators() {
+    public ISparkAccumulators getAccumulators() {
         return accumulators;
     }
 
@@ -153,46 +156,13 @@ public abstract class AbstractLoggingFunctionBase implements Serializable {
         }
         incrementNumberCalled();
 
-        SparkAccumulators accumulators1 = getAccumulators();
+        ISparkAccumulators accumulators1 = getAccumulators();
         if (accumulators1 == null)
             return;
         long time = getAndClearAccumulatedTime();
         accumulators1.incrementFunctionAccumulator(className, time);
-//        if ( accumulators1.isAccumulatorRegistered(className)) {
-//            accumulators1.incrementAccumulator(className);
-//        }
-//        if(SparkUtilities.isLocal()) {
-//            accumulators1.incrementThreadAccumulator(); // track which thread we are using
-//        }
-//        else {
-//            accumulators1.incrementThreadAccumulator(); // track which thread we are using
-//            accumulators1.incrementMachineAccumulator();
-//        }
+
     }
 
-//
-//    /**
-//     * Todo Why might this help SLewis - added only to debug serialization
-//     * Always treat de-serialization as a full-blown constructor, by
-//     * validating the final state of the de-serialized object.
-//     */
-//    private void readObject(
-//            ObjectInputStream aInputStream
-//    ) throws ClassNotFoundException, IOException {
-//        //always perform the default de-serialization first
-//        aInputStream.defaultReadObject();
-//    }
-//
-//    /**
-//     * Todo Why might this help SLewis - added only to debug serialization
-//     * This is the default implementation of writeObject.
-//     * Customise if necessary.
-//     */
-//    private void writeObject(
-//            ObjectOutputStream aOutputStream
-//    ) throws IOException {
-//        //perform the default serialization for all non-transient, non-static fields
-//        aOutputStream.defaultWriteObject();
-//    }
 
 }

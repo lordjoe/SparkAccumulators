@@ -1,4 +1,4 @@
-package com.lordjoe.distributed;
+package com.lordjoe.distributed.spark.accumulators;
 
 import org.apache.spark.api.java.function.*;
 
@@ -6,27 +6,27 @@ import java.io.*;
 
 /**
  * org.apache.spark.api.java.function.AbstraceLoggingFunction
+ * stand in for  FlatMapFunction
  * superclass for defined functions that will log on first call making it easier to see
  * do work in doCall
  * User: Steve
  * Date: 10/23/2014
  */
-public abstract class AbstractLoggingFunction<K extends Serializable, V extends Serializable>
-        extends AbstractLoggingFunctionBase implements Function<K, V> {
+public abstract class AbstractLoggingFlatMapFunction<T, R extends Serializable>
+        extends AbstractLoggingFunctionBase implements FlatMapFunction<T, R> {
 
 
     /**
-     * override doCall
+     * NOTE override doCall not this
      *
-     * @param v1
+     * @param t
      * @return
-     * @throws Exception
      */
     @Override
-    public final V call(final K v1) throws Exception {
+    public final Iterable<R> call(final T t) throws Exception {
         reportCalls();
         long startTime = System.nanoTime();
-        V ret = doCall(v1);
+        Iterable<R> ret =  doCall(t);
         long estimatedTime = System.nanoTime() - startTime;
         incrementAccumulatedTime(estimatedTime);
          return ret;
@@ -38,5 +38,6 @@ public abstract class AbstractLoggingFunction<K extends Serializable, V extends 
      * @param v1
      * @return
      */
-    public abstract V doCall(final K v1) throws Exception;
+     public abstract Iterable<R> doCall(final T t) throws Exception;
+
 }

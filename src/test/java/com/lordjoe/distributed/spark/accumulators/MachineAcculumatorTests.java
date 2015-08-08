@@ -1,6 +1,5 @@
 package com.lordjoe.distributed.spark.accumulators;
 
-import com.lordjoe.distributed.*;
 import org.junit.*;
 
 import java.util.*;
@@ -30,7 +29,7 @@ public class MachineAcculumatorTests {
 
     @Test
     public void testMachineAccumulator() {
-        String name = SparkUtilities.getMacAddress();
+        String name = MachineUseAccumulator.getMacAddress();
 
         MachineUseAccumulator acc = MachineUseAccumulator.empty();
         MachineUseAccumulator acc2 = MachineUseAccumulator.empty();

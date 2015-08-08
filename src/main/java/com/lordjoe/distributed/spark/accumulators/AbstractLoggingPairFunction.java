@@ -1,8 +1,9 @@
-package com.lordjoe.distributed;
+package com.lordjoe.distributed.spark.accumulators;
 
 import org.apache.spark.api.java.function.*;
+import scala.*;
 
-import java.io.*;
+import java.io.Serializable;
 
 /**
  * org.apache.spark.api.java.function.AbstraceLoggingFunction
@@ -11,8 +12,8 @@ import java.io.*;
  * User: Steve
  * Date: 10/23/2014
  */
-public abstract class AbstractLoggingFlatMapFunction<T, R extends Serializable>
-        extends AbstractLoggingFunctionBase implements FlatMapFunction<T, R> {
+public abstract class AbstractLoggingPairFunction<T extends Serializable, K extends Serializable, V extends Serializable>
+        extends AbstractLoggingFunctionBase implements PairFunction<T, K, V> {
 
 
     /**
@@ -22,10 +23,10 @@ public abstract class AbstractLoggingFlatMapFunction<T, R extends Serializable>
      * @return
      */
     @Override
-    public final Iterable<R> call(final T t) throws Exception {
+    public final Tuple2<K, V> call(final T t) throws Exception {
         reportCalls();
         long startTime = System.nanoTime();
-        Iterable<R> ret =  doCall(t);
+        Tuple2<K, V> ret = doCall(t);
         long estimatedTime = System.nanoTime() - startTime;
         incrementAccumulatedTime(estimatedTime);
          return ret;
@@ -38,6 +39,6 @@ public abstract class AbstractLoggingFlatMapFunction<T, R extends Serializable>
      * @return
      */
 
-    public abstract Iterable<R> doCall(final T t) throws Exception;
+    public abstract Tuple2<K, V> doCall(final T t) throws Exception;
 
 }
