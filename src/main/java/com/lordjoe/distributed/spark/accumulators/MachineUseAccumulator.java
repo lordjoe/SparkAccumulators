@@ -199,7 +199,7 @@ public class MachineUseAccumulator implements IAccumulator<MachineUseAccumulator
 
         sb.append(" totalTime:");
         long totaltime = getTotalTime();
-        sb.append(Long_Formatter.format(totaltime));
+        sb.append(AccumulatorUtilities.formatNanosec(totaltime));
 
         sb.append(" machines:");
         sb.append(size());

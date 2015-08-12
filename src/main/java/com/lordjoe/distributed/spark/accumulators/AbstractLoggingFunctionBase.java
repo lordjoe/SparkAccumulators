@@ -1,6 +1,8 @@
 package com.lordjoe.distributed.spark.accumulators;
 
 
+import com.lordjoe.algorithms.*;
+
 import java.io.*;
 
 /**
@@ -150,7 +152,7 @@ public abstract class AbstractLoggingFunctionBase implements Serializable {
         if (getCallReportInterval() > 0) {
             long numberCalls1 = getNumberCalls();
             if (numberCalls1 > 0 && numberCalls1 % getCallReportInterval() == 0) {
-                System.err.println("Calling Function " + className + " " + numberCalls1 / 1000 + "k times");
+                System.err.println("Calling Function " + className + " " + Long_Formatter.format(numberCalls1) + " times");
                 System.err.println(" Function took " + className + " " + formatNanosec(totalTime) + " running for " + formatMillisec(getRunningTimeMillisec()));
              }
         }

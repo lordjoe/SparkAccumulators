@@ -18,10 +18,11 @@ import java.util.*;
  */
 public class MemoryUseAccumulator implements IAccumulator<MemoryUseAccumulator> {
 
-    public static final int MEG_40 = 100000000; // 10 MB
-    public static final int MAX_TRACKED_100_MEG_CHUNKS = 2000; // up to 20 gb
-    public static final int MEG_4 = 40000000; // 1 MB
-    public static final int MAX_TRACKED_40_MEG_CHUNKS = 200; // up to 20 gb
+    public static final int ONE_K = 1025;
+    public static final int MEG_40 = 500 * ONE_K * ONE_K; // 10 MB
+    public static final int MAX_TRACKED_100_MEG_CHUNKS = (int)(20L * ONE_K * ONE_K * ONE_K / MEG_40 ); // up to 20 gb
+    public static final int MEG_4 = 200 * ONE_K * ONE_K; // 1 MB
+    public static final int MAX_TRACKED_40_MEG_CHUNKS =  (int)(20L * ONE_K * ONE_K * ONE_K / MEG_4 ); ; // up to 20 gb
 
     public static final AccumulatorParam<MemoryUseAccumulator> PARAM_INSTANCE = new IAccumulatorParam<MemoryUseAccumulator>();
 

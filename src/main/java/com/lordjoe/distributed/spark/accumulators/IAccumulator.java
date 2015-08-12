@@ -28,7 +28,7 @@ public interface IAccumulator<K> extends Serializable {
 
     /**
       * given a value return it as 0
-     *  default behavior os th return the value itself
+     *  default behavior is to return the value itself
        * @param added
       * @return
       */
