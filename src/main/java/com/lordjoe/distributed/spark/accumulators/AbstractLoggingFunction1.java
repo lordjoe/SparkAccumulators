@@ -1,21 +1,23 @@
 package com.lordjoe.distributed.spark.accumulators;
 
+import com.lordjoe.algorithms.Long_Formatter;
+import scala.Function1;
+import scala.runtime.AbstractFunction1;
 
-import com.lordjoe.algorithms.*;
-
-import java.io.*;
+import java.io.Serializable;
 
 /**
- * com.lordjoe.distributed.spark.accumulators.AbstraceLoggingFunction
+ * com.lordjoe.distributed.spark.accumulators.AbstractLoggingFunction1
+ * stand in for  Function1
  * superclass for defined functions that will log on first call making it easier to see
- * also will keep an accumulator to track calls and where ther are made
  * do work in doCall
  * User: Steve
  * Date: 10/23/2014
  */
-public abstract class AbstractLoggingFunctionBase implements Serializable {
+public  abstract  class AbstractLoggingFunction1<T1 extends Serializable,  R extends Serializable>
+        extends AbstractFunction1<T1, R> {
 
-   // write ever y time the function is called this many times
+    // write ever y time the function is called this many times
     private static int callReportInterval = 50000;
 
     public static int getCallReportInterval() {
@@ -35,16 +37,16 @@ public abstract class AbstractLoggingFunctionBase implements Serializable {
     private final ISparkAccumulators accumulators;
 
 
-    protected AbstractLoggingFunctionBase() {
-         // make an accumulator if one does not exist - should happen in hte executor
-         accumulators = AccumulatorUtilities.getInstance();
+    protected AbstractLoggingFunction1() {
+        // make an accumulator if one does not exist - should happen in hte executor
+        accumulators = AccumulatorUtilities.getInstance();
         if (!isFunctionCallsLogged())
             return;
-         // build an accumulator for this function
+        // build an accumulator for this function
         if (accumulators != null) {
             String className = getClass().getSimpleName();
             accumulators.createFunctionAccumulator(className);
-          }
+        }
     }
 
     public long getTotalTime() {
@@ -154,7 +156,7 @@ public abstract class AbstractLoggingFunctionBase implements Serializable {
             if (numberCalls1 > 0 && numberCalls1 % getCallReportInterval() == 0) {
                 System.err.println("Calling Function " + className + " " + Long_Formatter.format(numberCalls1) + " times");
                 System.err.println(" Function took " + className + " " + formatNanosec(totalTime) + " running for " + formatMillisec(getRunningTimeMillisec()));
-             }
+            }
         }
         incrementNumberCalled();
 
@@ -164,6 +166,26 @@ public abstract class AbstractLoggingFunctionBase implements Serializable {
         long time = getAndClearAccumulatedTime();
         accumulators1.incrementFunctionAccumulator(className, time);
 
+    }
+
+
+    /**
+     * do work here
+     *
+     * @param v1 inpu
+     * @return
+     */
+    public abstract R doApply(final T1 v1);
+
+
+    @Override
+    public R apply(T1 v1) {
+        reportCalls();
+        long startTime = System.nanoTime();
+        R ret = doApply(v1 );
+        long estimatedTime = System.nanoTime() - startTime;
+        incrementAccumulatedTime(estimatedTime);
+        return ret;
     }
 
 

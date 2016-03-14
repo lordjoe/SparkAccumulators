@@ -160,7 +160,7 @@ public class BasicSparkAccumulators implements ISparkAccumulators {
      * @param acc
      */
     @Override
-    public <K> Accumulator<K> createSpecialAccumulator(String id, AccumulatorParam<K> param, K initialValue) {
+    public <K> Accumulator<K> createSpecialAccumulator(String id, AccumulatorParam<K> param, K initialValue ) {
         Accumulator<K> ret = specialaccumulators.get(id);
         if (specialaccumulators.get(id) != null)
             return ret; // already done - should an exception be thrown

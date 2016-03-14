@@ -12,7 +12,7 @@ import java.io.*;
 * Date: 11/12/2014
 */
 public class LongAccumulableParam implements AccumulatorParam<Long>,Serializable {
-    public static final LongAccumulableParam INSTANCE = new LongAccumulableParam();
+    public static final AccumulatorParam<Long> INSTANCE = new LongAccumulableParam();
     private LongAccumulableParam() {}
      @Override
     public Long addAccumulator(final Long r, final Long t) {

@@ -94,7 +94,7 @@ public interface ISparkAccumulators extends Serializable {
      * @param <K>  type to accumulate
      * @return  the accululator
      */
-    public  <K> Accumulator<K> createSpecialAccumulator(String id, AccumulatorParam<K> param, K initialValue);
+    public  <K> Accumulator<K> createSpecialAccumulator(String id, AccumulatorParam<K> param, K initialValue );
 
     /**
      * make an accumulator of type long
